@@ -11,10 +11,29 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 
 function Movable({ children }: { children: ReactNode }) {
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: translateX.value,
+      },
+      {
+        translateY: translateY.value,
+      },
+    ],
+  }));
+
+  const pan = Gesture.Pan().onChange((event) => {
+    translateX.value += event.changeX;
+    translateY.value += event.changeY;
+  });
+
   return (
-    <GestureDetector>
+    <GestureDetector gesture={pan}>
       <Animated.View>
-        <Animated.View style={[{ position: "absolute" }]}>
+        <Animated.View style={[{ position: "absolute" }, style]}>
           {children}
         </Animated.View>
       </Animated.View>
