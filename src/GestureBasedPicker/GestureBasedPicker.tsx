@@ -2,6 +2,9 @@ import type { ComponentProps } from "react";
 import React from "react";
 import Icon from "@expo/vector-icons/MaterialIcons";
 import Animated, {
+  measure,
+  runOnJS,
+  useAnimatedRef,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -28,14 +31,21 @@ function snapPoint(x: number, vx: number) {
   return position * WIDTH;
 }
 
-function Sticker({
+export function Sticker({
   iconName,
   color,
+  addItem,
 }: {
   iconName: ComponentProps<typeof Icon>["name"];
   color: ColorValue;
+  addItem: (
+    iconName: ComponentProps<typeof Icon>["name"],
+    color: ColorValue,
+    size: number
+  ) => void;
 }) {
   const scale = useSharedValue(1);
+  const ref = useAnimatedRef();
 
   const tap = Gesture.Tap().onEnd(() => {});
   const longPress = Gesture.Tap()
@@ -47,6 +57,8 @@ function Sticker({
     })
     .onFinalize(() => {
       scale.value = withSpring(1);
+      const size = measure(ref);
+      runOnJS(addItem)(iconName, color, size.width);
     });
 
   const style = useAnimatedStyle(() => ({
@@ -61,7 +73,15 @@ function Sticker({
   );
 }
 
-function Toolbar() {
+export function Toolbar({
+  onItemPress,
+}: {
+  onItemPress: (
+    iconName: ComponentProps<typeof Icon>["name"],
+    color: ColorValue,
+    size: number
+  ) => void;
+}) {
   const offset = useSharedValue(0);
 
   const pan = Gesture.Pan()
@@ -96,10 +116,14 @@ function Toolbar() {
             style,
           ]}
         >
-          <Sticker iconName="favorite" color="#ffaaa8" />
-          <Sticker iconName="grade" color="#001a72" />
-          <Sticker iconName="thumb-up" color="#ffee86" />
-          <Sticker iconName="emoji-events" color="#8ed3ef" />
+          <Sticker iconName="favorite" color="#ffaaa8" addItem={onItemPress} />
+          <Sticker iconName="grade" color="#001a72" addItem={onItemPress} />
+          <Sticker iconName="thumb-up" color="#ffee86" addItem={onItemPress} />
+          <Sticker
+            iconName="emoji-events"
+            color="#8ed3ef"
+            addItem={onItemPress}
+          />
         </Animated.View>
       </GestureDetector>
       <Icon

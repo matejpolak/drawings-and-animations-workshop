@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
-import React from "react";
+import type { ReactNode, ComponentProps } from "react";
+import React, { useCallback, useState } from "react";
+import type { ColorValue } from "react-native";
 import { View } from "react-native";
 import Icon from "@expo/vector-icons/MaterialIcons";
 import Animated, {
@@ -14,6 +15,7 @@ import {
   scale3d,
   translate3d,
 } from "../components/matrixMath";
+import { Toolbar } from "../GestureBasedPicker";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 
@@ -60,11 +62,37 @@ function Movable({ children }: { children: ReactNode }) {
 }
 
 export function AllTheGestures() {
+  const [items, setItems] = useState<ReactNode[]>([]);
+
+  const onAddItem = useCallback(
+    (
+      iconName: ComponentProps<typeof Icon>["name"],
+      color: ColorValue,
+      size: number
+    ) => {
+      setItems([
+        ...items,
+        <Movable>
+          <AnimatedIcon name={iconName} color={color} size={size} />
+        </Movable>,
+      ]);
+    },
+    [items]
+  );
+
   return (
     <View style={{ width: "100%", height: "100%" }}>
-      <Movable>
-        <AnimatedIcon name="favorite" color="#ffaaa8" size={150} />
-      </Movable>
+      {items}
+      <View
+        style={{
+          position: "absolute",
+          bottom: 50,
+          width: "100%",
+          alignItems: "center",
+        }}
+      >
+        <Toolbar onItemPress={onAddItem} />
+      </View>
     </View>
   );
 }
