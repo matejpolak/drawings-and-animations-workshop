@@ -8,26 +8,23 @@ import Animated, {
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
+import { createIdentityMatrix, translate3d } from "../components/matrixMath";
+
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 
 function Movable({ children }: { children: ReactNode }) {
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+  const matrix = useSharedValue(createIdentityMatrix());
 
   const style = useAnimatedStyle(() => ({
     transform: [
       {
-        translateX: translateX.value,
-      },
-      {
-        translateY: translateY.value,
+        matrix: matrix.value,
       },
     ],
   }));
 
-  const pan = Gesture.Pan().onChange((event) => {
-    translateX.value += event.changeX;
-    translateY.value += event.changeY;
+  const pan = Gesture.Pan().onChange(({ changeX, changeY }) => {
+    matrix.value = translate3d(matrix.value, changeX, changeY, 0);
   });
 
   return (
