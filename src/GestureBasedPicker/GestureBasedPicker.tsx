@@ -20,11 +20,12 @@ const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const WIDTH = 50;
 const STICKERS_COUNT = 4;
 
-function snapPoint(x: number) {
+function snapPoint(x: number, vx: number) {
   "worklet";
+  const simulatedX = x + vx * 0.1;
   const position = Math.max(
     -STICKERS_COUNT + 1,
-    Math.min(0, Math.round(x / WIDTH))
+    Math.min(0, Math.round(simulatedX / WIDTH))
   );
   return position * WIDTH;
 }
@@ -64,7 +65,9 @@ function Toolbar() {
       offset.value += e.changeX;
     })
     .onEnd((e) => {
-      offset.value = withSpring(snapPoint(offset.value));
+      offset.value = withSpring(snapPoint(offset.value, e.velocityX), {
+        velocity: e.velocityX,
+      });
     });
 
   const style = useAnimatedStyle(() => ({
