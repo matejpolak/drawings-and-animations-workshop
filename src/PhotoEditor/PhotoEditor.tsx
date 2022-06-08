@@ -12,20 +12,29 @@ import {
 import React from "react";
 import { Dimensions } from "react-native";
 
-import { Filters, f1, selectFilter } from "./Filters";
+import { Filters, selectFilter } from "./Filters";
+import { noFilter } from "./steps/Final/Filters";
 
 const zurich = require("../assets/zurich.jpg");
 const { width, height } = Dimensions.get("window");
-//const center = vec(width / 2, height / 2);
 
 export const PhotoEditor = () => {
+  const matrix = useValue(noFilter);
   const image = useImage(zurich);
+
+  const touchHandler = useTouchHandler({
+    onEnd: (event) => {
+      selectFilter(matrix, event);
+    },
+  });
+
   if (!image) {
     return null;
   }
   return (
-    <Canvas style={{ flex: 1 }}>
+    <Canvas style={{ flex: 1 }} onTouch={touchHandler}>
       <Group>
+        <ColorMatrix matrix={matrix} />
         <Image
           x={0}
           y={0}

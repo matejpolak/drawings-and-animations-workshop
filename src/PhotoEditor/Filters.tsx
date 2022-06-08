@@ -13,9 +13,11 @@ import {
   rrect,
   ColorMatrix,
   Group,
+  Canvas,
+  useTouchHandler,
 } from "@shopify/react-native-skia";
 import React from "react";
-import { Dimensions } from "react-native";
+import { Dimensions, Pressable } from "react-native";
 
 import { contains } from "./Helpers";
 
@@ -25,10 +27,14 @@ const size = width / 4;
 const rects = new Array(4)
   .fill(0)
   .map((_, i) => rect(size * i, height - size - 125, size, size));
-export const f1 = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-const f2 = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-const f3 = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-const f4 = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+export const f1 = [
+  1, 0, 0, 0, 0, 0, 1, 0, 0, 0, -0.2, 0.2, 0.1, 0.4, 0, 0, 0, 0, 1, 0,
+];
+const f2 = [0, 1.0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0.6, 1, 0, 0, 0, 0, 0, 1, 0];
+const f3 = [
+  1, 0, 0, 1.9, -2.2, 0, 1, 0, 0.0, 0.3, 0, 0, 1, 0, 0.5, 0, 0, 0, 1, 0.2,
+];
+const f4 = [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0];
 export const filters = [f1, f2, f3, f4] as const;
 
 export const selectFilter = (
