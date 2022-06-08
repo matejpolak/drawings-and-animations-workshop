@@ -2,64 +2,39 @@ import React, { useEffect, useState } from "react";
 import Animated, {
   withTiming,
   useAnimatedStyle,
-  ZoomOut,
-  Keyframe,
-  ZoomIn,
   useSharedValue,
+  ZoomOut,
+  BounceIn,
 } from "react-native-reanimated";
 import { Pressable } from "react-native";
 import Icon from "@expo/vector-icons/MaterialIcons";
-import { useTiming } from "@shopify/react-native-skia";
 
 import { CenterScreen } from "../components/CenterScreen";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 
-const ACTIVE_COLOR = "#f3acac";
 const DEFAULT_COLOR = "#6c6b6b";
+const ACTIVE_COLOR = "#ffaaa8";
 
-const keyframe = new Keyframe({
-  0: {
-    transform: [
-      { rotate: "0deg" },
-      {
-        scale: 0.5,
-      },
-    ],
-  },
-  33: {
-    transform: [
-      { rotate: "-15deg" },
-      {
-        scale: 1.25,
-      },
-    ],
-  },
-  66: {
-    transform: [
-      { rotate: "15deg" },
-      {
-        scale: 1.5,
-      },
-    ],
-  },
-  100: {
-    transform: [
-      { rotate: "0deg" },
-      {
-        scale: 1,
-      },
-    ],
-  },
+const VX_MAX = 35;
+const VY_MAX = 80;
+const G = 10;
+const DURATION_SECONDS = 5;
+
+const getRandomPhysics = () => ({
+  VX: Math.random() * 2 * VX_MAX - VX_MAX,
+  VY: Math.random() * VY_MAX,
 });
 
-const VX = 30;
-const VY = 50;
-const G = 10;
-const DURATION_SECONDS = 10;
-
-function Heart() {
+function FlyingHeart() {
   const time = useSharedValue(0);
+  const { VX, VY } = getRandomPhysics();
+
+  useEffect(() => {
+    time.value = withTiming(DURATION_SECONDS * 1000, {
+      duration: DURATION_SECONDS * 1000,
+    });
+  }, []);
 
   const style = useAnimatedStyle(() => {
     const t = time.value / 1000;
@@ -75,23 +50,48 @@ function Heart() {
         },
       ],
     };
-  }, [time]);
+  }, []);
 
   return (
-    <Pressable
-      onPress={() => {
-        time.value = withTiming(DURATION_SECONDS * 1000, {
-          duration: DURATION_SECONDS * 1000,
-        });
-      }}
-    >
+    <Pressable>
       <AnimatedIcon
         name={"favorite"}
         size={50}
         color={DEFAULT_COLOR}
-        style={style}
+        style={[{ position: "absolute" }, style]}
       />
     </Pressable>
+  );
+}
+
+function ExplodingHearts({ count }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, index) => (
+        <FlyingHeart key={index} />
+      ))}
+    </>
+  );
+}
+
+function Heart() {
+  const [selected, setSelected] = useState(false);
+
+  return (
+    <>
+      <Pressable onPress={() => setSelected(!selected)}>
+        <AnimatedIcon
+          key={selected ? 1 : 0}
+          name="favorite"
+          size={50}
+          color={selected ? ACTIVE_COLOR : DEFAULT_COLOR}
+          exiting={ZoomOut}
+          entering={BounceIn}
+          style={{ position: "absolute" }}
+        />
+      </Pressable>
+      {selected && <ExplodingHearts count={15} />}
+    </>
   );
 }
 
