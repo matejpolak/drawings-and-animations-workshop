@@ -6,6 +6,7 @@ import Animated, {
   FadeIn,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   ZoomOut,
 } from "react-native-reanimated";
 import type { ColorValue } from "react-native";
@@ -17,6 +18,16 @@ import { CenterScreen } from "../components/CenterScreen";
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 
 const WIDTH = 50;
+const STICKERS_COUNT = 4;
+
+function snapPoint(x: number) {
+  "worklet";
+  const position = Math.max(
+    -STICKERS_COUNT + 1,
+    Math.min(0, Math.round(x / WIDTH))
+  );
+  return position * WIDTH;
+}
 
 function Sticker({
   iconName,
@@ -48,9 +59,13 @@ function Sticker({
 function Toolbar() {
   const offset = useSharedValue(0);
 
-  const pan = Gesture.Pan().onChange((event) => {
-    offset.value += event.changeX;
-  });
+  const pan = Gesture.Pan()
+    .onChange((e) => {
+      offset.value += e.changeX;
+    })
+    .onEnd((e) => {
+      offset.value = withSpring(snapPoint(offset.value));
+    });
 
   const style = useAnimatedStyle(() => ({
     transform: [
@@ -80,6 +95,12 @@ function Toolbar() {
           <Sticker iconName="emoji-events" color="#8ed3ef" />
         </Animated.View>
       </GestureDetector>
+      <Icon
+        name={"expand-less"}
+        size={30}
+        color={"#000"}
+        style={{ position: "absolute", bottom: -30, left: -15 }}
+      />
     </View>
   );
 }
