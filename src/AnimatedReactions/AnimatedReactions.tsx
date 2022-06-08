@@ -8,6 +8,9 @@ import Animated, {
   withSequence,
   useAnimatedReaction,
   withRepeat,
+  BounceIn,
+  BounceOut,
+  ZoomOut,
 } from "react-native-reanimated";
 import { Pressable } from "react-native";
 import Icon from "@expo/vector-icons/MaterialIcons";
@@ -19,45 +22,14 @@ const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const ACTIVE_COLOR = "#f3acac";
 const DEFAULT_COLOR = "#6c6b6b";
 
-const WOBBLE_START = "0deg";
-const WOBBLE_END = "15deg";
-
 function Heart() {
   const [selected, setSelected] = useState(false);
-  const wobble = useSharedValue(WOBBLE_START);
-
-  const styles = useAnimatedStyle(
-    () => ({
-      transform: [{ rotate: wobble.value }],
-    }),
-    [wobble]
-  );
 
   const animatedProps = useAnimatedStyle(
     () => ({
       color: withTiming(selected ? ACTIVE_COLOR : DEFAULT_COLOR),
     }),
     [selected]
-  );
-
-  useAnimatedReaction(
-    () => selected,
-    (value) => {
-      if (value) {
-        wobble.value = withRepeat(
-          withSequence(
-            withTiming(WOBBLE_END, {
-              duration: 50,
-            }),
-            withTiming(WOBBLE_START, {
-              duration: 50,
-            })
-          ),
-          3,
-          true
-        );
-      }
-    }
   );
 
   return (
@@ -67,10 +39,12 @@ function Heart() {
       }}
     >
       <AnimatedIcon
+        key={`Animated-${selected}`}
+        entering={BounceIn}
+        exiting={ZoomOut}
         name={"favorite"}
         size={50}
         animatedProps={animatedProps}
-        style={styles}
       />
     </Pressable>
   );
