@@ -1,16 +1,14 @@
 import type { ComponentProps } from "react";
-import React, { useState } from "react";
+import React from "react";
 import Icon from "@expo/vector-icons/MaterialIcons";
 import Animated, {
-  BounceIn,
-  FadeIn,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  ZoomOut,
+  withTiming,
 } from "react-native-reanimated";
 import type { ColorValue } from "react-native";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 
 import { CenterScreen } from "../components/CenterScreen";
@@ -37,23 +35,28 @@ function Sticker({
   iconName: ComponentProps<typeof Icon>["name"];
   color: ColorValue;
 }) {
-  const [selected, setSelected] = useState(false);
+  const scale = useSharedValue(1);
+
+  const tap = Gesture.Tap().onEnd(() => {});
+  const longPress = Gesture.LongPress()
+    .onStart(() => {
+      scale.value = withTiming(3, {
+        duration: 2000,
+      });
+    })
+    .onEnd(() => {
+      scale.value = withSpring(1);
+    });
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    zIndex: scale.value > 1 ? 100 : 1,
+  }));
 
   return (
-    <Pressable
-      onPress={() => {
-        setSelected(!selected);
-      }}
-    >
-      <AnimatedIcon
-        key={`Sticker-${selected}`}
-        entering={BounceIn}
-        exiting={ZoomOut}
-        name={iconName}
-        color={selected ? color : "#838181"}
-        size={50}
-      />
-    </Pressable>
+    <GestureDetector gesture={Gesture.Exclusive(tap, longPress)}>
+      <AnimatedIcon name={iconName} color={color} size={50} style={style} />
+    </GestureDetector>
   );
 }
 
