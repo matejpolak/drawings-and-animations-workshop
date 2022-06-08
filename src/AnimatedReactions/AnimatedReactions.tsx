@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Animated, {
   withTiming,
   useAnimatedStyle,
@@ -18,45 +18,26 @@ const ACTIVE_COLOR = "#f3acac";
 const DEFAULT_COLOR = "#6c6b6b";
 
 function Heart() {
-  const scale = useSharedValue(1);
-  const color = useSharedValue(DEFAULT_COLOR);
+  const [selected, setSelected] = useState(false);
 
   const styles = useAnimatedStyle(
     () => ({
-      transform: [{ scale: scale.value }],
+      transform: [{ scale: withSpring(selected ? 2 : 1) }],
     }),
-    [scale]
+    [selected]
   );
 
   const animatedProps = useAnimatedStyle(
     () => ({
-      color: color.value,
+      color: withTiming(selected ? ACTIVE_COLOR : DEFAULT_COLOR),
     }),
-    [color]
+    [selected]
   );
 
   return (
     <Pressable
       onPress={() => {
-        // Easing
-        // scale.value = withTiming(scale.value + 0.5, {
-        //   duration: 1000,
-        //   easing: Easing.ease,
-        // });
-
-        // Spring
-        // scale.value = withSpring(scale.value + 0.5, {
-        //   damping: 3,
-        // });
-
-        // Sequence
-        scale.value = withSequence(withSpring(2), withSpring(1));
-
-        // Color
-        color.value = withSequence(
-          withTiming(ACTIVE_COLOR),
-          withTiming(DEFAULT_COLOR)
-        );
+        setSelected(!selected);
       }}
     >
       <AnimatedIcon
