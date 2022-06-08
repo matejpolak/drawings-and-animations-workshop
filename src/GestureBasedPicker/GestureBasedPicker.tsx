@@ -38,13 +38,14 @@ function Sticker({
   const scale = useSharedValue(1);
 
   const tap = Gesture.Tap().onEnd(() => {});
-  const longPress = Gesture.LongPress()
-    .onStart(() => {
+  const longPress = Gesture.Tap()
+    .maxDuration(1e8)
+    .onBegin(() => {
       scale.value = withTiming(3, {
         duration: 2000,
       });
     })
-    .onEnd(() => {
+    .onFinalize(() => {
       scale.value = withSpring(1);
     });
 
