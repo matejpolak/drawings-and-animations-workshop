@@ -9,6 +9,7 @@ import {
   SweepGradient,
   RadialGradient,
   BlurMask,
+  LinearGradient,
 } from "@shopify/react-native-skia";
 import React from "react";
 import { Dimensions } from "react-native";
@@ -34,6 +35,31 @@ export const ReactLogo = () => {
   return (
     <Canvas style={{ flex: 1 }}>
       <Fill color="white" />
+      <Circle r={r} color={c1} c={center} />
+      <Group>
+        <SweepGradient c={center} colors={[c1, c2, c1]} />
+        <Oval rect={rct} style={"stroke"} strokeWidth={strokeWidth} />
+        <Group
+          transform={[
+            {
+              rotate: Math.PI / 3,
+            },
+          ]}
+          origin={center}
+        >
+          <Oval rect={rct} style={"stroke"} strokeWidth={strokeWidth} />
+        </Group>
+        <Group
+          transform={[
+            {
+              rotate: -Math.PI / 3,
+            },
+          ]}
+          origin={center}
+        >
+          <Oval rect={rct} style={"stroke"} strokeWidth={strokeWidth} />
+        </Group>
+      </Group>
     </Canvas>
   );
 };
