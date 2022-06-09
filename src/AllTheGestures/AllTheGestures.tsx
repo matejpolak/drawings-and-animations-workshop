@@ -1,5 +1,5 @@
 import type { ReactNode, ComponentProps } from "react";
-import React, { useCallback, useState } from "react";
+import React, { Fragment, useCallback, useState } from "react";
 import type { ColorValue } from "react-native";
 import { View } from "react-native";
 import Icon from "@expo/vector-icons/MaterialIcons";
@@ -82,7 +82,9 @@ export function AllTheGestures() {
 
   return (
     <View style={{ width: "100%", height: "100%" }}>
-      {items}
+      {items.map((item, index) => (
+        <Fragment key={index}>{item}</Fragment>
+      ))}
       <View
         style={{
           position: "absolute",

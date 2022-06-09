@@ -66,9 +66,11 @@ export function Sticker({
         duration: 2000,
       });
     })
+    .onEnd(() => {
+      addItemFromUI();
+    })
     .onFinalize(() => {
       scale.value = withSpring(1);
-      addItemFromUI();
     });
 
   const style = useAnimatedStyle(() => ({
