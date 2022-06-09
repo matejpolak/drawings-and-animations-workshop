@@ -18,8 +18,8 @@ const ACTIVE_COLOR = "#ffaaa8";
 
 const VX_MAX = 35;
 const VY_MAX = 80;
-const G = 10;
-const DURATION_SECONDS = 5;
+const G = 15;
+const DURATION_SECONDS = 30;
 
 const getRandomPhysics = () => ({
   VX: Math.random() * 2 * VX_MAX - VX_MAX,
@@ -32,7 +32,7 @@ function FlyingHeart() {
 
   useEffect(() => {
     time.value = withTiming(DURATION_SECONDS * 1000, {
-      duration: DURATION_SECONDS * 1000,
+      duration: (DURATION_SECONDS * 1000) / 10,
     });
   }, []);
 
@@ -53,14 +53,12 @@ function FlyingHeart() {
   }, []);
 
   return (
-    <Pressable>
-      <AnimatedIcon
-        name={"favorite"}
-        size={50}
-        color={DEFAULT_COLOR}
-        style={[{ position: "absolute" }, style]}
-      />
-    </Pressable>
+    <AnimatedIcon
+      name={"favorite"}
+      size={50}
+      color={ACTIVE_COLOR}
+      style={[{ position: "absolute" }, style]}
+    />
   );
 }
 
@@ -87,7 +85,6 @@ function Heart() {
           color={selected ? ACTIVE_COLOR : DEFAULT_COLOR}
           exiting={ZoomOut}
           entering={BounceIn}
-          style={{ position: "absolute" }}
         />
       </Pressable>
       {selected && <ExplodingHearts count={15} />}
