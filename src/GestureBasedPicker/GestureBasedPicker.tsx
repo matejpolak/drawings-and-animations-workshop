@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { Component, ComponentProps } from "react";
 import React from "react";
 import Icon from "@expo/vector-icons/MaterialIcons";
 import Animated, {
@@ -34,11 +34,11 @@ function snapPoint(x: number, vx: number) {
 export function Sticker({
   iconName,
   color,
-  addItem,
+  onPress,
 }: {
   iconName: ComponentProps<typeof Icon>["name"];
   color: ColorValue;
-  addItem: (
+  onPress?: (
     iconName: ComponentProps<typeof Icon>["name"],
     color: ColorValue,
     size: number
@@ -47,7 +47,18 @@ export function Sticker({
   const scale = useSharedValue(1);
   const ref = useAnimatedRef();
 
-  const tap = Gesture.Tap().onEnd(() => {});
+  function addItemFromUI() {
+    "worklet";
+    const { width } = measure(ref);
+    if (onPress) {
+      runOnJS(onPress)(iconName, color, width);
+    }
+  }
+
+  const tap = Gesture.Tap().onEnd(() => {
+    addItemFromUI();
+  });
+
   const longPress = Gesture.Tap()
     .maxDuration(1e8)
     .onBegin(() => {
@@ -57,8 +68,7 @@ export function Sticker({
     })
     .onFinalize(() => {
       scale.value = withSpring(1);
-      const size = measure(ref);
-      runOnJS(addItem)(iconName, color, size.width);
+      addItemFromUI();
     });
 
   const style = useAnimatedStyle(() => ({
@@ -68,7 +78,13 @@ export function Sticker({
 
   return (
     <GestureDetector gesture={Gesture.Exclusive(tap, longPress)}>
-      <AnimatedIcon name={iconName} color={color} size={50} style={style} />
+      <AnimatedIcon
+        ref={ref}
+        name={iconName}
+        color={color}
+        size={50}
+        style={style}
+      />
     </GestureDetector>
   );
 }
@@ -76,7 +92,7 @@ export function Sticker({
 export function Toolbar({
   onItemPress,
 }: {
-  onItemPress: (
+  onItemPress?: (
     iconName: ComponentProps<typeof Icon>["name"],
     color: ColorValue,
     size: number
@@ -116,20 +132,19 @@ export function Toolbar({
             style,
           ]}
         >
-          <Sticker iconName="favorite" color="#ffaaa8" addItem={onItemPress} />
-          <Sticker iconName="grade" color="#001a72" addItem={onItemPress} />
-          <Sticker iconName="thumb-up" color="#ffee86" addItem={onItemPress} />
+          <Sticker iconName="favorite" color="#ffaaa8" onPress={onItemPress} />
+          <Sticker iconName="grade" color="#001a72" onPress={onItemPress} />
+          <Sticker iconName="thumb-up" color="#ffee86" onPress={onItemPress} />
           <Sticker
             iconName="emoji-events"
             color="#8ed3ef"
-            addItem={onItemPress}
+            onPress={onItemPress}
           />
         </Animated.View>
       </GestureDetector>
       <Icon
         name={"expand-less"}
         size={30}
-        color={"#000"}
         style={{ position: "absolute", bottom: -30, left: -15 }}
       />
     </View>
